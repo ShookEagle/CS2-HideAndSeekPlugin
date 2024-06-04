@@ -6,6 +6,7 @@ using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
 using System.Net.NetworkInformation;
+using System.Reflection;
 
 namespace HideAndSeekPlugin;
 
@@ -51,7 +52,7 @@ public class HideAndSeekPlugin : BasePlugin, IPluginConfig<HNSConfig>
 
         if (allPlayers.Count < Instance.Config.MinPlayers)
         {
-            Server.PrintToChatAll(Instance.Config.Prefix + Instance.Localizer["Minimum player", Instance.Config.MinPlayers]);
+            Server.PrintToChatAll($"{TextColor.Red}{Instance.Config.Prefix}{TextColor.Default} Minimum {TextColor.LightBlue}{Instance.Config.MinPlayers}{TextColor.Default} required to start.");
             return false;
         }
         if (RoundWinner == null)
@@ -59,12 +60,14 @@ public class HideAndSeekPlugin : BasePlugin, IPluginConfig<HNSConfig>
             PlayerTerrorist = allPlayers[Random.Next(allPlayers.Count)];
             PlayerTerrorist.SwitchTeam(CsTeam.Terrorist);
             Server.PrintToChatAll($"{TextColor.Red}{Instance.Config.Prefix} {TextColor.Green}{PlayerTerrorist.PlayerName}{TextColor.Default} Is The Seeker");
+            PlayerTerrorist = null;
             return true;
         }
         if (RoundWinner != null)
         {
             RoundWinner.SwitchTeam(CsTeam.Terrorist);
             Server.PrintToChatAll($"{TextColor.Red}{Instance.Config.Prefix} {TextColor.Green}{RoundWinner.PlayerName}{TextColor.Default} Is The Seeker");
+            RoundWinner = null;
             return true;
         }
         return false;
@@ -159,19 +162,21 @@ public class HideAndSeekPlugin : BasePlugin, IPluginConfig<HNSConfig>
 
         if (player.Team == CsTeam.CounterTerrorist)
         {
-            player.ChangeTeam(CsTeam.Terrorist);
+            player.SwitchTeam(CsTeam.Terrorist);
             player.Respawn();
             Server.PrintToChatAll($"{TextColor.Red}{Instance.Config.Prefix} {TextColor.Green}{player.PlayerName}{TextColor.Default} Was Found by the Seekers.");
             var CtPlayers = allPlayers.Where(c => c.Team == CsTeam.CounterTerrorist);
-            if (CtPlayers.Count() <= 1)
+            if (CtPlayers.Count() == 1)
             {
-                Server.PrintToChatAll($"{TextColor.Red}{Instance.Config.Prefix} {TextColor.Purple}{player.PlayerName}{TextColor.Default} Wins and will start as next Seeker.");
-                Utilities.FindAllEntitiesByDesignerName<CCSGameRulesProxy>("cs_gamerules").FirstOrDefault()?.GameRules?.TerminateRound(1.0f, RoundEndReason.RoundDraw);
+                var winner = CtPlayers.FirstOrDefault(c => c.PlayerName != player.PlayerName);
+                if (winner != null)
+                {
+                    Server.PrintToChatAll($"{TextColor.Red}{Instance.Config.Prefix} {TextColor.Purple}{winner.PlayerName}{TextColor.Default} Wins and will start as next Seeker.");
+                    RoundWinner = winner;
+                }
+                Utilities.FindAllEntitiesByDesignerName<CCSGameRulesProxy>("cs_gamerules").FirstOrDefault()?.GameRules?.TerminateRound(1.0f, RoundEndReason.TerroristsWin);
             }
         }
-
-        Utilities.FindAllEntitiesByDesignerName<CCSGameRulesProxy>("cs_gamerules").FirstOrDefault()?.GameRules?.TerminateRound(1.0f, RoundEndReason.RoundDraw);
-
         return HookResult.Continue;
     }
 
