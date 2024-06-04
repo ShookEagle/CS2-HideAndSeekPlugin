@@ -48,7 +48,7 @@ public class HideAndSeekPlugin : BasePlugin, IPluginConfig<HNSConfig>
 
     public static bool Find()
     {
-        List<CCSPlayerController> allPlayers = Utilities.GetPlayers();
+        List<CCSPlayerController> allPlayers = Utilities.GetPlayers().Where(p => p.Team != CsTeam.Spectator).ToList();
 
         if (allPlayers.Count < Instance.Config.MinPlayers)
         {
@@ -109,7 +109,7 @@ public class HideAndSeekPlugin : BasePlugin, IPluginConfig<HNSConfig>
 
     public static HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
     {
-        List<CCSPlayerController> allPlayers = Utilities.GetPlayers();
+        List<CCSPlayerController> allPlayers = Utilities.GetPlayers().Where(p => p.Team != CsTeam.Spectator).ToList();
 
         PlayerTerrorist = null;
 
