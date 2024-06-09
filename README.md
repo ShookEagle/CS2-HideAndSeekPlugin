@@ -15,11 +15,12 @@ These features are what is currently working or planeed
   - [x] Allow for Multiple Starting Seekers
   - [ ] Allow Seekers to Instant Kill Hiders
   - [ ] Allow Seekers to be faster than Hiders
-- [ ] Allow for Team Balance and Zombie Styles Interchangeably
+- [ ] Allow for Different Game Styles Interchangeably
   - [x] Zombie Stlye
   - [ ] Team Balance Style
 - [ ] Add Custom Colors to Prefix for Customizablity
-- [x] Show Name of Killing Seeker 
+- [x] Show Name of Killing Seeker
+- [ ] Ct Taunts
 ## Install
 1. Install Metamod:Source and Counter Strike Sharp.
 2. Copy `HideAndSeekPlugin` to `csgo/addons/counterstrikesharp/plugins/`.
