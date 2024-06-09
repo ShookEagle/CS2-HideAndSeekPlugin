@@ -11,14 +11,14 @@ Hide and Seek Plugin manages gameplay of a Hide and Seek Gamemode.
 These features are what is currently working or planeed
 - [x] Auto Select Random Seeker
   - [x] Select Hiding Winner as Next Seeker
-  - [ ] Allow for Multiple Starting Seekers
+  - [x] Allow for Multiple Starting Seekers
   - [ ] Allow Seekers to Instant Kill Hiders
   - [ ] Allow Seekers to be faster than Hiders
 - [ ] Allow for Team Balance and Zombie Styles Interchangeably
   - [x] Zombie Stlye
   - [ ] Team Balance Style
 - [ ] Add Custom Colors to Prefix for Customizablity
-- [ ] Show Name of Killing Seeker 
+- [x] Show Name of Killing Seeker 
 ## Install
 1. Install Metamod:Source and Counter Strike Sharp.
 2. Copy `HideAndSeekPlugin` to `csgo/addons/counterstrikesharp/plugins/`.
