@@ -4,6 +4,7 @@ A CS2 Plugin Made for Hide and Seek on the [EdgeGamers](EdgeGamers.Com) Events S
 Hide and Seek Plugin manages gameplay of a Hide and Seek Gamemode.
 - Selects random first seeker.
 - The last hider to die will become the seeker next round.
+- Displays who found who
 ## Requirements
 - [MetaMod:Source](https://github.com/alliedmodders/metamod-source/)
 - [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp)
