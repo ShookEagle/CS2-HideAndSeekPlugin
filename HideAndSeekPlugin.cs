@@ -10,6 +10,8 @@ using System.Reflection;
 using System.Xml.Linq;
 using System.Threading;
 using CounterStrikeSharp.API.Modules.Entities;
+using System.Data.SqlTypes;
+using System.Numerics;
 
 
 
@@ -48,6 +50,8 @@ public class HideAndSeekPlugin : BasePlugin, IPluginConfig<Config>
         if (arg == 3 && player != null && player.Team != CsTeam.Terrorist)
         {
             player.SwitchTeam(CsTeam.CounterTerrorist);
+            player.PlayerPawn.Value.MaxHealth = 100;
+            player.PlayerPawn.Value.Health = 100;
             return HookResult.Continue;
         }
         if (arg == 3 && player != null && player.Team == CsTeam.Terrorist)
@@ -81,7 +85,9 @@ public class HideAndSeekPlugin : BasePlugin, IPluginConfig<Config>
             if (player != null)
             {
                 player.SwitchTeam(CsTeam.Terrorist);
-                player.GiveNamedItem("weapon_knife");
+                player.Respawn();
+                player.PlayerPawn.Value.MaxHealth = 9999;
+                player.PlayerPawn.Value.Health = 9999;
                 Server.PrintToChatAll($"[{ChatColors.Blue}{Instance.Config.Prefix}{ChatColors.White}] {ChatColors.Green}{player.PlayerName}{ChatColors.White} is now seeking.");
             }
         }
@@ -99,6 +105,7 @@ public class HideAndSeekPlugin : BasePlugin, IPluginConfig<Config>
         return randomplayers;
     }
 
+
     [GameEventHandler(HookMode.Post)]
     public HookResult OnPlayerDeath(EventPlayerDeath @event, GameEventInfo info)
     {
@@ -113,8 +120,8 @@ public class HideAndSeekPlugin : BasePlugin, IPluginConfig<Config>
                 Server.RunOnTickAsync(Server.TickCount + 32, () =>
                 {
                     player.Respawn();
-                    player.RemoveWeapons();
-                    player.GiveNamedItem("weapon_knife");
+                    player.PlayerPawn.Value.MaxHealth = 9999;
+                    player.PlayerPawn.Value.Health = 9999;
                 });
                 return HookResult.Continue;
             }
@@ -124,8 +131,8 @@ public class HideAndSeekPlugin : BasePlugin, IPluginConfig<Config>
                 {
                     player.SwitchTeam(CsTeam.Terrorist);
                     player.Respawn();
-                    player.RemoveWeapons();
-                    player.GiveNamedItem("weapon_knife");
+                    player.PlayerPawn.Value.MaxHealth = 9999;
+                    player.PlayerPawn.Value.Health = 9999;
 
                     if (seeker != null && seeker.IsValid)
                     {
@@ -147,7 +154,7 @@ public class HideAndSeekPlugin : BasePlugin, IPluginConfig<Config>
                                 Server.PrintToChatAll($"[{ChatColors.Blue}{Instance.Config.Prefix}{ChatColors.White}] {ChatColors.Purple}{winner.PlayerName}{ChatColors.White} has Won and will start as a Seeker.");
                             }
                         }
-                        Utilities.FindAllEntitiesByDesignerName<CCSGameRulesProxy>("cs_gamerules").FirstOrDefault()?.GameRules?.TerminateRound(1.0f, RoundEndReason.TerroristsWin);
+                        Utilities.FindAllEntitiesByDesignerName<CCSGameRulesProxy>("cs_gamerules").FirstOrDefault()?.GameRules?.TerminateRound(1.0f, RoundEndReason.RoundDraw);
                     }
                 });
                 return HookResult.Continue;
@@ -157,15 +164,23 @@ public class HideAndSeekPlugin : BasePlugin, IPluginConfig<Config>
     }
 
     [GameEventHandler(HookMode.Post)]
-    public HookResult OnRoundStart(EventRoundStart @event, GameEventInfo info)
+    public HookResult OnRoundPreStart(EventRoundPrestart @event, GameEventInfo info)
     {
         List<CCSPlayerController> allPlayers = Utilities.GetPlayers().Where(p => p.Team != CsTeam.CounterTerrorist).ToList();
         Find();
+        return HookResult.Continue;
+    }
+
+    [GameEventHandler(HookMode.Post)]
+    public HookResult OnRoundStart(EventRoundStart @event, GameEventInfo info)
+    {
+        List<CCSPlayerController> allPlayers = Utilities.GetPlayers().Where(p => p.Team == CsTeam.Terrorist).ToList();
         foreach (var player in allPlayers)
         {
-            player.RemoveWeapons();
+            player.PlayerPawn.Value.MaxHealth = 9999;
+            player.PlayerPawn.Value.Health = 9999;
         }
-        return HookResult.Continue;
+            return HookResult.Continue;
     }
 
     [GameEventHandler(HookMode.Post)]
@@ -177,7 +192,8 @@ public class HideAndSeekPlugin : BasePlugin, IPluginConfig<Config>
             if (player != null)
             {
                 player.SwitchTeam(CsTeam.CounterTerrorist);
-                player.RemoveWeapons();
+                player.PlayerPawn.Value.MaxHealth = 100;
+                player.PlayerPawn.Value.Health = 100;
             }
         }
         return HookResult.Continue;
